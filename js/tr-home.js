@@ -1,9 +1,13 @@
 $(document).ready(function(){
 
-    $('#home-bookNow, .overlay-close').off().on('click' ,function(){
+    $('#home-bookNow').off().on('click' ,function(){
+        getLatitudeLongitude('from-location')
         toggleOverlay();
     });
 
+    $('.overlay-close').off().on('click', function(){
+        toggleOverlay();
+    })
 
     $(window).scroll(function(){
         scrollPage();
@@ -13,8 +17,9 @@ $(document).ready(function(){
 $(window).load(function(){
     locationAutoComplete('from-location');
     locationAutoComplete('to-location');
-    mapsLocationFinder();
+    //mapsLocationFinder();
 });
+
 
 
 function locationAutoComplete(documentId){
@@ -36,24 +41,58 @@ function locationAutoComplete(documentId){
         }
     });
 }
+/*Get Longitude and Latitude from Input box*/
+function getLatitudeLongitude(id) {
+    geocoder = new google.maps.Geocoder();
+    var address = document.getElementById(id).value;
+    geocoder.geocode( { 'address': address}, function(results, status) {
+        if (status == google.maps.GeocoderStatus.OK) {
+            mapsLocationFinder(results[0].geometry.location.lat(), results[0].geometry.location.lng())
+        }
+        else {
+            cosole.log("Location provided is not found" + status);
+        }
+    });
+}
 
-function mapsLocationFinder(){
+function getAddressFromLatLng(latlng){
+    var latlng = new google.maps.LatLng(latlng.lat(),latlng.lng());
+    var geocoder = geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ 'latLng': latlng }, function (results, status) {
+        if (status == google.maps.GeocoderStatus.OK) {
+            if (results[0]) {
+                console.dir(results);
+                alert("Location: " + results[0].formatted_address);
+            }
+        }
+    });
+}
+
+
+function mapsLocationFinder(latitude ,longitude){
     var mapCanvas = document.getElementById('map-canvas');
-    var latLong = new google.maps.LatLng(12.9562, 77.7019)
+    latLong = new google.maps.LatLng(latitude, longitude);
     var mapOptions = {
         center: latLong,
-        zoom: 19,
+        zoom: 18,
         mapTypeId: google.maps.MapTypeId.ROADMAP
     }
     var map = new google.maps.Map(mapCanvas, mapOptions)
-
     var marker=new google.maps.Marker({
         map: map,
         position:latLong,
         draggable: true
     });
     marker.setMap(map);
+
+    google.maps.event.addListener(marker, 'dragend', function() {
+        //updateMarkerStatus('Drag ended');
+        //geocodePosition(marker.getPosition());
+        getAddressFromLatLng(marker.getPosition());
+        //alert(marker.getPosition())
+    });
 }
+
 
 function toggleOverlay() {
     var overlayStatus = $('div.overlay');
@@ -65,7 +104,7 @@ function toggleOverlay() {
 }
 
 function scrollPage() {
-    var sy = scrollY();
+    var sy = window.pageYOffset || $('.nav-head.nav-home').scrollTop;
     if ( sy >= 0 ) {
         $('.nav-head.nav-home').addClass('sticky-header');
     }
@@ -74,6 +113,19 @@ function scrollPage() {
     }
 }
 
-function scrollY() {
-    return window.pageYOffset || $('.nav-head.nav-home').scrollTop;
+/*var longLatLocation = function(logitude, latitude){
+    this.logitude = logitude;
+    this.latitude = latitude;
+
+    this.getLongitude = function(){
+        return this.logitude;
+    }
+    this.getLatitude = function(){
+        return this.latitude;
+    }
+}*/
+
+
+function validateBookForm(){
+
 }
