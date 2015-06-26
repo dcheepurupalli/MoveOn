@@ -514,22 +514,24 @@ Overlay
     margin: auto;
     padding: 15px;
     box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+    min-height: 530px;
 }
 
 /* Overlay closing cross */
 .overlay .overlay-close {
-    width: 80px;
-    height: 80px;
+    width: 30px;
+    height: 30px;
     position: absolute;
-    right: 20px;
-    top: 20px;
+    right: 10px;
+    top: 10px;
     overflow: hidden;
     border: none;
     background: url(../img/cross.png) no-repeat center center;
     text-indent: 200%;
     color: transparent;
     outline: none;
-    z-index: 100;
+    z-index: 10000;
+
 }
 .overlay-scale {
     visibility: hidden;
@@ -545,8 +547,8 @@ Overlay
     opacity: 1;
     -webkit-transform: scale(1);
     transform: scale(1);
-    -webkit-transition: -webkit-transform 0.4s, opacity 0.4s;
-    transition: transform 0.4s, opacity 0.4s;
+    -webkit-transition: -webkit-transform 0.2s, opacity 0.2s;
+    transition: transform 0.2s, opacity 0.2s;
 }
 .overlay nav {
     text-align: center;
@@ -596,6 +598,44 @@ Overlay
 MAPS OVERLAY
 =================================================*/
 #map-canvas {
-    width: 100%;
-    height: 70%;
+    height: 100%;
+}
+.oly-address-container{
+    padding-top :10px;
+
+}
+.oly-label{
+    color: #3f6183;
+    font-weight: 500;
+}
+.oly-address{
+    margin-bottom: 5px;
+}
+.oly-address textarea{
+    width:100%;
+    border: 1px solid #E5E5E5;
+    padding: 5px 8px;
+    height: 100px;
+}
+.oly-address input{
+    width:100%;
+    border: 1px solid #E5E5E5;
+    padding: 5px 8px;
+}
+.oly-use-btn{
+    background :#5d80a1;
+    border-color: #5d80a1;
+}
+input, textarea {
+    -webkit-transition: all 0.20s ease-in-out;
+    -moz-transition: all 0.20s ease-in-out;
+    -ms-transition: all 0.20s ease-in-out;
+    -o-transition: all 0.20s ease-in-out;
+    outline: none;
+
+}
+
+input:focus, textarea:focus {
+    box-shadow: 0 0 5px rgba(81, 203, 238, 1);
+    border: 1px solid rgba(81, 203, 238, 1);
 }

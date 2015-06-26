@@ -132,11 +132,31 @@
 </section>
 
 <div class="overlay overlay-scale">
+    <div style="position:relative; height:100%">
     <button type="button" class="overlay-close">Close</button>
-    <!--<div class="address-container">-->
-        <div id="map-canvas"></div>
-        <div id="address-getter"></div>
-    <!--</div>-->
+    <div class="col-md-8 col-sm-8 col-xs-12" id="map-canvas" style="display: inline-block"></div>
+    <div class="col-md-4 col-sm-4 col-xs-12 oly-address-container" style="display: inline-block; position:relative">
+        <div class="oly-label"><i></i><label>Name</label></div>
+        <div class="oly-address">
+            <input type="text"/>
+        </div>
+        <div class="oly-label"><i></i><label>Mobile Number</label></div>
+        <div class="oly-address">
+            <input type="tel" pattern="[0-9]{10}"/>
+        </div>
+        <div class="oly-label"><i></i><label>Pick-up Address</label></div>
+        <div class="oly-address">
+            <textarea id="from-Address-Overlay" class="oly-pickupAddress"></textarea>
+        </div>
+        <div class="oly-label"><i></i><label>Drop-off Address</label></div>
+        <div class="oly-address">
+            <textarea id="to-Address-Overlay" class="oly-dropoffAddress"></textarea>
+        </div>
+        <div class="">
+            <button id="oly-Continue" class="use-btn oly-use-btn" type="button">Continue</button>
+        </div>
+    </div>
+    </div>
 </div>
 
 <footer class="footer">

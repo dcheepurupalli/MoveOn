@@ -1,7 +1,8 @@
 $(document).ready(function(){
 
+    initialize();
     $('#home-bookNow').off().on('click' ,function(){
-        getLatitudeLongitude('from-location')
+        getMarkerLocations();
         toggleOverlay();
     });
 
@@ -17,8 +18,22 @@ $(document).ready(function(){
 $(window).load(function(){
     locationAutoComplete('from-location');
     locationAutoComplete('to-location');
-    //mapsLocationFinder();
 });
+
+//Global Variables
+function initialize(){
+    tr_mapCanvas = document.getElementById('map-canvas');
+    tr_latLng = new google.maps.LatLng('12.9667', '77.5667');
+    tr_mapOption = {
+        center: tr_latLng,
+        zoom: 18,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+    tr_map = new google.maps.Map(tr_mapCanvas, tr_mapOption);
+
+    tr_markersLocations = [];
+    tr_rawLocations = ["from-location","to-location"];
+}
 
 
 
@@ -41,8 +56,10 @@ function locationAutoComplete(documentId){
         }
     });
 }
+
+
 /*Get Longitude and Latitude from Input box*/
-function getLatitudeLongitude(id) {
+/*function getLatitudeLongitude(id) {
     geocoder = new google.maps.Geocoder();
     var address = document.getElementById(id).value;
     geocoder.geocode( { 'address': address}, function(results, status) {
@@ -50,26 +67,12 @@ function getLatitudeLongitude(id) {
             mapsLocationFinder(results[0].geometry.location.lat(), results[0].geometry.location.lng())
         }
         else {
-            cosole.log("Location provided is not found" + status);
+            console.log("Location provided is not found" + status);
         }
     });
-}
+}*/
 
-function getAddressFromLatLng(latlng){
-    var latlng = new google.maps.LatLng(latlng.lat(),latlng.lng());
-    var geocoder = geocoder = new google.maps.Geocoder();
-    geocoder.geocode({ 'latLng': latlng }, function (results, status) {
-        if (status == google.maps.GeocoderStatus.OK) {
-            if (results[0]) {
-                console.dir(results);
-                alert("Location: " + results[0].formatted_address);
-            }
-        }
-    });
-}
-
-
-function mapsLocationFinder(latitude ,longitude){
+/*function mapsLocationFinder(latitude ,longitude){
     var mapCanvas = document.getElementById('map-canvas');
     latLong = new google.maps.LatLng(latitude, longitude);
     var mapOptions = {
@@ -86,12 +89,10 @@ function mapsLocationFinder(latitude ,longitude){
     marker.setMap(map);
 
     google.maps.event.addListener(marker, 'dragend', function() {
-        //updateMarkerStatus('Drag ended');
-        //geocodePosition(marker.getPosition());
         getAddressFromLatLng(marker.getPosition());
-        //alert(marker.getPosition())
     });
-}
+}*/
+
 
 
 function toggleOverlay() {
@@ -113,19 +114,103 @@ function scrollPage() {
     }
 }
 
-/*var longLatLocation = function(logitude, latitude){
-    this.logitude = logitude;
-    this.latitude = latitude;
+function getMarkerLocations(){
+   for(var i= 0; i < tr_rawLocations.length; i++){
+       geocoder = new google.maps.Geocoder();
+       var address = $('#'+tr_rawLocations[i]).val();
+       if(tr_rawLocations[i] == 'to-location'){
+           geocoder.geocode({ 'address': address}, function(results, status) {
+               if (status == google.maps.GeocoderStatus.OK) {
+                   setDropMarker(results[0].geometry.location);
+                   tr_markersLocations.push(results[0].geometry.location);
+               }
+               else {
+                   console.log("Location provided is not found" + status);
+               }
+           });
+       }else{
+           geocoder.geocode({ 'address': address}, function(results, status) {
+               if (status == google.maps.GeocoderStatus.OK) {
+                   setPickUpMarker(results[0].geometry.location);
+                   tr_markersLocations.push(results[0].geometry.location);
+               }
+               else {
+                   console.log("Location provided is not found" + status);
+               }
+           });
+       }
+   }
+}
 
-    this.getLongitude = function(){
-        return this.logitude;
-    }
-    this.getLatitude = function(){
-        return this.latitude;
+/*function setMarkers(latitude, longitude){
+    if(latitude && longitude){
+        tr_markersLocations.push(new google.maps.LatLng(latitude, longitude));
+        var latlng = new google.maps.LatLng(latitude, longitude);
+        var marker= new google.maps.Marker({
+            map: tr_map,
+            position: latlng,
+            draggable: true
+        });
+        marker.setMap(tr_map);
+        showAllMarkersInZoom();
+        google.maps.event.addListener(marker, 'dragend', function() {
+            console.dir(this);
+            getAddressFromLatLng(marker.getPosition());
+        });
     }
 }*/
 
+function showAllMarkersInZoom(){
+    var bounds = new google.maps.LatLngBounds();
+    for(var i in tr_markersLocations){
+        bounds.extend(tr_markersLocations[i]);
+    }
+    tr_map.fitBounds(bounds);
+}
 
-function validateBookForm(){
+function getAddressFromLatLng(latlng, addressId){
+    var latlng = new google.maps.LatLng(latlng.lat(),latlng.lng());
+    var geocoder = geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ 'latLng': latlng }, function (results, status) {
+        if (status == google.maps.GeocoderStatus.OK) {
+            if (results[0]) {
+                $(addressId).val(results[0].formatted_address);
+            }
+        }
+    });
+}
 
+
+/* Drop the Markers and get the address while markers are dragged*/
+function setPickUpMarker(latLng){
+   var pickUpMarkerLocation = "#from-Address-Overlay";
+    if(latLng == null){
+        latLng = tr_latLng;
+    }
+    var pickUpMarker  = new google.maps.Marker({
+        map: tr_map,
+        position: latLng,
+        draggable: true
+    });
+
+    google.maps.event.addListener(pickUpMarker, 'dragend', function() {
+        getAddressFromLatLng(pickUpMarker.getPosition(), pickUpMarkerLocation);
+    });
+}
+
+/*Drop the Markers and get the address while marker dragged*/
+function setDropMarker(latLng){
+    var dropMarkerLocation = "#to-Address-Overlay";
+    if(latLng == null){
+        latLng = tr_latLng;
+    }
+    var dropMarker = new google.maps.Marker({
+        map: tr_map,
+        position: latLng,
+        draggable: true
+    });
+
+    google.maps.event.addListener(dropMarker, 'dragend', function() {
+        getAddressFromLatLng(dropMarker.getPosition(), dropMarkerLocation);
+    });
 }
